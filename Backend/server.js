@@ -1,25 +1,45 @@
 import express from "express";
 import cors from "cors";
-import { Pool } from "pg";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-
+import compression from "compression";
+import { Pool } from "pg";
 dotenv.config();
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+app.use((req, res, next) => {
+  res.setTimeout(10 * 60 * 1000); // 10 minutes
+  next();
+});
+
+
+app.use(compression());
+
+// app.use(bodyParser.json());
+app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ limit: "100mb", extended: true }));
+
 
 /* ------------------ POSTGRESQL CONNECTION ------------------ */
+// const pool = new Pool({
+//   host: process.env.DB_HOST,
+//   user: process.env.DB_USER,
+//   password: process.env.DB_PASS,
+//   database: process.env.DB_NAME,
+//   port: process.env.DB_PORT || 5432,
+//   ssl: {
+//     rejectUnauthorized: false
+//   }
+// });
+
+
+
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 5432,
+  connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
 // Create table if not exists
@@ -47,6 +67,36 @@ pool.connect()
 /* -------------------------------------------------------
    UPLOAD JSON API
 -------------------------------------------------------- */
+// app.post("/upload-json", async (req, res) => {
+//   const { file_name, json_data } = req.body;
+
+//   if (!file_name || !json_data) {
+//     return res.status(400).json({ message: "Invalid payload" });
+//   }
+
+//   try {
+//     await pool.query(
+//       "INSERT INTO uploaded_files (file_name, json_data) VALUES ($1, $2)",
+//       [file_name, JSON.stringify(json_data)]
+//       // [file_name,json_data]
+//     );
+
+//     res.json({ message: "Excel data saved successfully!" });
+//   }catch (err) {
+//   console.error("❌ DB Insert Error FULL:", err.message);
+//   console.error(err.stack);
+//   return res.status(500).json({
+//     message: "Database insert failed",
+//     error: err.message
+//   });
+// }
+// });
+//   } catch (err) {
+//     console.error("❌ DB Insert Error:", err);
+//     res.status(500).json({ message: "Database insert failed" });
+//   }
+// });
+
 app.post("/upload-json", async (req, res) => {
   const { file_name, json_data } = req.body;
 
@@ -57,15 +107,16 @@ app.post("/upload-json", async (req, res) => {
   try {
     await pool.query(
       "INSERT INTO uploaded_files (file_name, json_data) VALUES ($1, $2)",
-      [file_name, JSON.stringify(json_data)]
+      [file_name, JSON.stringify(json_data)]  // ✅ IMPORTANT
     );
 
     res.json({ message: "Excel data saved successfully!" });
   } catch (err) {
-    console.error("❌ DB Insert Error:", err);
+    console.error("❌ DB Insert Error:", err.message);
     res.status(500).json({ message: "Database insert failed" });
   }
 });
+
 
 /* -------------------------------------------------------
    HISTORY LIST API (SIDEBAR)
@@ -115,6 +166,11 @@ app.get("/history/:id", async (req, res) => {
 /* -------------------------------------------------------
    START SERVER
 -------------------------------------------------------- */
-app.listen(5000, () => {
-  console.log("🚀 Server running on port 5000");
+// app.listen(5000, () => {
+//   console.log("🚀 Server running on port 5000");
+// });
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
