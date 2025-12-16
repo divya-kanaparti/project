@@ -11,6 +11,9 @@ export default function TaskPage() {
   const [selectedSheet, setSelectedSheet] = useState("");
   const [query, setQuery] = useState("");
   const [newRow, setNewRow] = useState([]);
+  const [visibleRows, setVisibleRows] = useState(100);
+const ROWS_PER_BATCH = 100;
+
 const [newColumnName, setNewColumnName] = useState("");
 const [editingRowIndex, setEditingRowIndex] = useState(null);
   // const [divisions, setDivisions] = useState([]);
@@ -43,6 +46,10 @@ const currentDivisions = divisionsBySheet[selectedSheet] || [];
   useEffect(() => {
     if (showMenu) loadHistory();
   }, [showMenu]);
+
+  useEffect(() => {
+  setVisibleRows(500);
+}, [query, selectedSheet]);
 
   // ----------------------------
   // Robust timestamp formatter
@@ -242,6 +249,7 @@ const currentDivisions = divisionsBySheet[selectedSheet] || [];
     });
 
     setSheetData(rows);
+    setVisibleRows(100);
     // setDivisions(detectDivisions(rows));
     setDivisionsBySheet({
   [wb.SheetNames[0]]: detectDivisions(rows),
@@ -955,7 +963,11 @@ const isHeaderRow = (rowIndex) => {
             <div style={styles.tableWrapper}>
               <table style={styles.table}>
                 <tbody>
-                  {filteredData.map((item, index) => {
+                  {/* {filteredData.map((item, index) => { */}
+                   {filteredData
+  .slice(0, visibleRows)
+  .map((item, index) => {
+ 
                     const row = item.row;
 
                     const nonEmpty = row.filter(
@@ -1047,6 +1059,22 @@ const isHeaderRow = (rowIndex) => {
                   })}
                 </tbody>
               </table>
+              {visibleRows < filteredData.length && (
+  <button
+    onClick={() => setVisibleRows(prev => prev + ROWS_PER_BATCH)}
+    style={{
+      marginTop: "15px",
+      padding: "10px 20px",
+      background: "#c9a646",
+      borderRadius: "8px",
+      fontWeight: "600",
+      cursor: "pointer"
+    }}
+  >
+    Load More Rows
+  </button>
+)}
+
             </div>
 
             <Link to="/" style={styles.backButton}>
