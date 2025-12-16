@@ -18,6 +18,8 @@ const [editingRowIndex, setEditingRowIndex] = useState(null);
   const [selectedDivision, setSelectedDivision] = useState("");
   const API_BASE = "https://project-nohx.onrender.com";
 
+  //  const API_BASE = "http://localhost:5000";
+
   // ⭐ NEW
   const [showMenu, setShowMenu] = useState(false);
   const [historyData, setHistoryData] = useState([]);
@@ -394,7 +396,12 @@ const getDataRowIndexes = (start = 0, end = sheetData.length) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           file_name: fileName,
-          json_data: sheetData,
+          // json_data: sheetData,
+          json_data: {
+  sheet: selectedSheet,
+  rows: sheetData.slice(0, 5000) // LIMIT rows
+}
+
         }),
       });
 
@@ -633,6 +640,20 @@ const viewHistoryFile = async (item) => {
 
   setShowMenu(false);
 };
+const deleteRow = (rowIndex) => {
+  if (!window.confirm("Are you sure you want to delete this row?")) return;
+
+  const updated = [...sheetData];
+  updated.splice(rowIndex, 1);
+
+  setSheetData(updated);
+
+  // update workbook also
+  workbook.Sheets[selectedSheet] = XLSX.utils.aoa_to_sheet(updated);
+};
+
+
+
 
 // ⭐ DOWNLOAD HISTORY FILE
 const downloadHistoryFile = async (item) => {
@@ -1006,6 +1027,13 @@ const isHeaderRow = (rowIndex) => {
 </button>
 
   )}
+  <button
+    onClick={() => deleteRow(index)}
+    style={{ ...styles.iconBtn, color: "#ff6b6b" }}
+    title="Delete row"
+  >
+    🗑
+  </button>
 </td>
 
 
