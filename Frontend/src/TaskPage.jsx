@@ -1701,6 +1701,13 @@ const getDataRowIndexes = (start = 0, end = sheetData.length) => {
 
   return indexes;
 };
+const dataRowCount = React.useMemo(() => {
+  if (!Array.isArray(sheetData)) return 0;
+
+  return sheetData.filter((row, index) =>
+    isDataRow(row, index)
+  ).length;
+}, [sheetData]);
 
 
 
@@ -2168,9 +2175,13 @@ const isHeaderRow = (rowIndex) => {
               </button>
             </div>
 
-            <div style={styles.rowCount}>
+            {/* <div style={styles.rowCount}>
               Count: { filteredData.filter(item =>
-                        isDataRow(item.row, sheetData.indexOf(item.row))).length}
+                        isDataRow(item.row, sheetData.indexOf(item.row))).length} */}
+                    <div style={styles.rowCount}>
+  Count: {dataRowCount}
+</div>
+
               {foundSheets.length > 0 && (
                 <span style={{ marginLeft: 10 }}>
                   (Found in: {foundSheets.join(", ")})
