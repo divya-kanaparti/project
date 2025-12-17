@@ -1669,36 +1669,32 @@ const isDataRow = (row, rowIndex) => {
   return nonEmpty > 1;
 };
   // Search
-  const filteredData = React.useMemo(() => {
-    if (!workbook) return [];
-    if (!query) {
-      return Array.isArray(sheetData)
-        ? sheetData.map((row) => ({ sheet: selectedSheet, row }))
-        : [];
-    }
+ const filteredData = React.useMemo(() => {
+  if (!Array.isArray(sheetData)) return [];
 
-    const lower = query.toLowerCase();
-    const results = [];
+  if (!query) {
+    return sheetData.map((row, i) => ({
+      row,
+      rowIndex: i,
+      sheet: selectedSheet,
+    }));
+  }
 
-    workbook.SheetNames.forEach((sheet) => {
-      const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheet], {
-        header: 1,
-        raw: false,
-      });
+  const lower = query.toLowerCase();
 
-      rows.forEach((row) => {
-        if (
-          row.some((cell) =>
-            String(cell ?? "").toLowerCase().includes(lower)
-          )
-        ) {
-          results.push({ sheet, row });
-        }
-      });
-    });
+  return sheetData
+    .map((row, i) => ({ row, rowIndex: i }))
+    .filter(({ row }) =>
+      row.some(cell =>
+        String(cell ?? "").toLowerCase().includes(lower)
+      )
+    )
+    .map(item => ({
+      ...item,
+      sheet: selectedSheet,
+    }));
+}, [query, sheetData, selectedSheet]);
 
-    return results;
-  }, [query, workbook, selectedSheet, sheetData]);
 
   const foundSheets = [...new Set(filteredData.map((i) => i.sheet))];
 
@@ -2197,8 +2193,11 @@ const normalizeRow = (row, cols) => {
             </div>
 
                     <div style={styles.rowCount}>
-  Count: {dataRowCount}
-{/* </div> */}
+  Count: { filteredData.filter(item =>
+      isDataRow(item.row, item.rowIndex)
+    ).length
+  }
+
 
               {foundSheets.length > 0 && (
                 <span style={{ marginLeft: 10 }}>
