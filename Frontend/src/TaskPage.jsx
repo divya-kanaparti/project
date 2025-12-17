@@ -2402,7 +2402,7 @@ const isHeaderRow = (rowIndex) => {
                             {String(cell ?? "")}
                           </td>
                         ))} */}
-                      </tr>
+                      
                     );
                   })}
                 </tbody>
