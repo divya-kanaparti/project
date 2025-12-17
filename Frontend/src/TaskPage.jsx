@@ -1968,28 +1968,6 @@ const handleCellChange = (rowIndex, colIndex, value) => {
   setSheetData(updated);
   workbook.Sheets[selectedSheet] = XLSX.utils.aoa_to_sheet(updated);
 };
-const isHeaderRow = (rowIndex) => {
-  if (!sheetData || rowIndex === 0) return true;
-
-  const currentRow = sheetData[rowIndex];
-  const prevRow = sheetData[rowIndex - 1];
-
-  const currentNonEmpty = currentRow.filter(
-    v => String(v ?? "").trim() !== ""
-  ).length;
-
-  const prevNonEmpty = prevRow.filter(
-    v => String(v ?? "").trim() !== ""
-  ).length;
-
-  // Case 1: division title row
-  if (currentNonEmpty === 1) return true;
-
-  // Case 2: column header row (after division title)
-  if (currentNonEmpty > 1 && prevNonEmpty === 1) return true;
-
-  return false; // ✅ data row
-}
 
 
 const viewHistoryFile = async (item) => {
