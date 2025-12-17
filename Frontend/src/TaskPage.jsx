@@ -1630,8 +1630,44 @@ const deleteRow = (rowIndex) => {
   // keep workbook in sync
   workbook.Sheets[selectedSheet] = XLSX.utils.aoa_to_sheet(updated);
 };
+const isHeaderRow = (rowIndex) => {
+  if (!sheetData || rowIndex === 0) return true;
 
+  const currentRow = sheetData[rowIndex];
+  const prevRow = sheetData[rowIndex - 1];
 
+  const currentNonEmpty = currentRow.filter(
+    v => String(v ?? "").trim() !== ""
+  ).length;
+
+  const prevNonEmpty = prevRow.filter(
+    v => String(v ?? "").trim() !== ""
+  ).length;
+
+  // Case 1: division title row
+  if (currentNonEmpty === 1) return true;
+
+  // Case 2: column header row (after division title)
+  if (currentNonEmpty > 1 && prevNonEmpty === 1) return true;
+
+  return false; // ✅ data row
+};
+const isDataRow = (row, rowIndex) => {
+  if (!Array.isArray(row)) return false;
+
+  const nonEmpty = row.filter(
+    v => String(v ?? "").trim() !== ""
+  ).length;
+
+  // ❌ exclude division titles
+  if (nonEmpty === 1) return false;
+
+  // ❌ exclude headers
+  if (isHeaderRow(rowIndex)) return false;
+
+  // ✅ real data row
+  return nonEmpty > 1;
+};
   // Search
   const filteredData = React.useMemo(() => {
     if (!workbook) return [];
@@ -1936,7 +1972,28 @@ const handleCellChange = (rowIndex, colIndex, value) => {
   setSheetData(updated);
   workbook.Sheets[selectedSheet] = XLSX.utils.aoa_to_sheet(updated);
 };
+const isHeaderRow = (rowIndex) => {
+  if (!sheetData || rowIndex === 0) return true;
 
+  const currentRow = sheetData[rowIndex];
+  const prevRow = sheetData[rowIndex - 1];
+
+  const currentNonEmpty = currentRow.filter(
+    v => String(v ?? "").trim() !== ""
+  ).length;
+
+  const prevNonEmpty = prevRow.filter(
+    v => String(v ?? "").trim() !== ""
+  ).length;
+
+  // Case 1: division title row
+  if (currentNonEmpty === 1) return true;
+
+  // Case 2: column header row (after division title)
+  if (currentNonEmpty > 1 && prevNonEmpty === 1) return true;
+
+  return false; // ✅ data row
+}
 
 
 const viewHistoryFile = async (item) => {
@@ -1989,22 +2046,7 @@ const downloadHistoryFile = async (item) => {
   }
 };
 
- const isDataRow = (row, rowIndex) => {
-  if (!Array.isArray(row)) return false;
-
-  const nonEmpty = row.filter(
-    v => String(v ?? "").trim() !== ""
-  ).length;
-
-  // ❌ exclude division titles
-  if (nonEmpty === 1) return false;
-
-  // ❌ exclude headers
-  if (isHeaderRow(rowIndex)) return false;
-
-  // ✅ real data row
-  return nonEmpty > 1;
-};
+ 
 const maxCols = React.useMemo(() => {
   if (!Array.isArray(sheetData)) return 0;
   return Math.max(
@@ -2022,28 +2064,7 @@ const normalizeRow = (row, cols) => {
   return normalized;
 };
 
-const isHeaderRow = (rowIndex) => {
-  if (!sheetData || rowIndex === 0) return true;
 
-  const currentRow = sheetData[rowIndex];
-  const prevRow = sheetData[rowIndex - 1];
-
-  const currentNonEmpty = currentRow.filter(
-    v => String(v ?? "").trim() !== ""
-  ).length;
-
-  const prevNonEmpty = prevRow.filter(
-    v => String(v ?? "").trim() !== ""
-  ).length;
-
-  // Case 1: division title row
-  if (currentNonEmpty === 1) return true;
-
-  // Case 2: column header row (after division title)
-  if (currentNonEmpty > 1 && prevNonEmpty === 1) return true;
-
-  return false; // ✅ data row
-};
 
 
 
