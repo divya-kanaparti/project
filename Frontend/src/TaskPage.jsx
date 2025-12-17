@@ -2177,7 +2177,7 @@ const isHeaderRow = (rowIndex) => {
 
                     <div style={styles.rowCount}>
   Count: {dataRowCount}
-</div>
+{/* </div> */}
 
               {foundSheets.length > 0 && (
                 <span style={{ marginLeft: 10 }}>
