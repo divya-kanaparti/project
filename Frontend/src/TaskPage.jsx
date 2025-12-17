@@ -2175,9 +2175,6 @@ const isHeaderRow = (rowIndex) => {
               </button>
             </div>
 
-            {/* <div style={styles.rowCount}>
-              Count: { filteredData.filter(item =>
-                        isDataRow(item.row, sheetData.indexOf(item.row))).length} */}
                     <div style={styles.rowCount}>
   Count: {dataRowCount}
 </div>
