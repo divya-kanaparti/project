@@ -2288,59 +2288,6 @@ const isHeaderRow = (rowIndex) => {
                     }
 
                     return (
-//                       <tr key={index}>
-//                         {row.map((cell, c) => (
-//   <td key={c} style={styles.cell}>
-//     {editingRowIndex === index ? (
-      
-//       <input
-//   value={cell ?? ""}
-//   onChange={(e) => handleCellChange(index, c, e.target.value)}
-//   style={{
-//     width: "100%",
-//     height: "28px",
-//     padding: "2px 6px",
-//     fontSize: "13px",
-//     borderRadius: "4px",
-//     border: "1px solid #ccc",
-//     outline: "none",
-//   }}
-// />
-
-//     ) : (
-//       <span>{String(cell ?? "")}</span>
-//     )}
-//   </td>
-// ))}
-// <td style={styles.cell}>
-//   {editingRowIndex === index ? (
-//     <button
-//       onClick={() => setEditingRowIndex(null)}
-//       style={styles.iconBtn}
-//       title="Save"
-//     >
-//       💾
-//     </button>
-//   ) : (
-//     <>
-//       <button
-//         onClick={() => setEditingRowIndex(index)}
-//         style={styles.iconBtn}
-//         title="Edit"
-//       >
-//         ✏️
-//       </button>
-
-//       <button
-//         onClick={() => deleteRow(index)}
-//         style={{ ...styles.iconBtn, color: "#ff6b6b" }}
-//         title="Delete"
-//       >
-//         🗑
-//       </button>
-//     </>
-//   )}
-// </td>
                               <tr key={index}>
   {normalizeRow(row, maxCols).map((cell, c) => (
     <td key={c} style={styles.cell}>
@@ -2394,15 +2341,6 @@ const isHeaderRow = (rowIndex) => {
     )}
   </td>
 </tr>
-
-
-
-                        {/* {row.map((cell, c) => (
-                          <td key={c} style={styles.cell}>
-                            {String(cell ?? "")}
-                          </td>
-                        ))} */}
-                      
                     );
                   })}
                 </tbody>
